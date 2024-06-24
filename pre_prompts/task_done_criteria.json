@@ -1,0 +1,8 @@
+{
+    "template": "In context of [activity], for the task [task], meaning [description], what would be the final outcome of the task that can be considered as a milestone to mark the task as complete? Give me a single line answer.",
+    "variable_names": [
+        "activity",
+        "task",
+        "description"
+    ]
+}
