@@ -59,9 +59,11 @@ def main():
         if prompt_choice in pre_prompts:
             prompt_data = pre_prompts[prompt_choice]
             st.subheader(f"Pre-built Prompt: {prompt_choice}")
+            is_pre_built = True
         else:
             prompt_data = user_prompts[prompt_choice]
             st.subheader(f"User Prompt: {prompt_choice}")
+            is_pre_built = False
 
         template = prompt_data["template"]
         variable_names = prompt_data["variable_names"]
@@ -70,18 +72,44 @@ def main():
         variable_dict = {}
         for var_name in variable_names:
             var_value = st.text_input(f"Enter value for {var_name}", key=var_name)
-            # print(var_name)
             if var_value:
                 variable_dict[var_name] = var_value
 
         if st.button("Generate"):
             if len(variable_dict) == len(variable_names):
                 output_prompt = build_prompt(template, variable_dict)
-                st.text_area("Generated Prompt", output_prompt, height=100)
+                st.subheader("Generated Prompt:")
+                st.text(output_prompt)
             else:
                 st.warning("Please fill in all the variables.")
 
-    st.header("Add New Prompt")
+        if not is_pre_built:
+            st.header("Edit Prompt Template ✏️")
+            new_template = st.text_area("Edit prompt template", value=template)
+
+            if st.button("Save Edited Prompt"):
+                if new_template:
+                    new_variable_names = extract_variable_names(new_template)
+                    for var_name in [var for var in re.findall(r'\[(.*?)\]', new_template)]:
+                        new_template = replace_ignore_case(new_template, f'[{var_name}]', f'[{var_name.lower().replace(" ", "_")}]')
+                        
+                    save_prompt(USER_PROMPT_DIR, prompt_choice, new_template, new_variable_names)
+                    st.success(f"Prompt '{prompt_choice}' updated successfully!")
+                    st.experimental_rerun()
+                else:
+                    st.warning("Please provide a valid template for the prompt.")
+            
+            if st.button("Delete Prompt 🗑️"):
+                os.remove(os.path.join(USER_PROMPT_DIR, f"{prompt_choice}.json"))
+                st.success(f"Prompt '{prompt_choice}' deleted successfully!")
+                st.experimental_rerun()
+                
+        else:
+            st.subheader("Prompt Template")
+            st.text(template)
+            st.warning("Pre-built prompts cannot be edited.")
+
+    st.header("Add New Prompt Template")
     new_prompt_name = st.text_input("Enter new prompt name")
     new_prompt_name = new_prompt_name.strip().replace(" ", "_").lower()
     new_template = st.text_area("Enter new prompt template")
@@ -91,7 +119,6 @@ def main():
         
         for var_name in [var for var in re.findall(r'\[(.*?)\]', new_template)]:
             new_template = replace_ignore_case(new_template, f'[{var_name}]', f'[{var_name.lower().replace(" ", "_")}]')
-            # print(new_template)
 
     if st.button("Save New Prompt"):
         if new_prompt_name and new_template and new_variable_names:
