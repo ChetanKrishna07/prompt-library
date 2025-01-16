@@ -1,0 +1,6 @@
+{
+    "template": "Create an image of [subject] using a minimalistic 3D theme. The image must use the following colors:  \n\nrgb(28,165,79) - Forest Green. \n\nrgb(255,228,93) - Dandelion Yellow. \n\nrgb(255,255,255) - Pure White. \n\nrgb(224,224,224) - Light Gray. \n\nrgb(0, 102, 179) - Blue. \n\nThe background of the image must be white ",
+    "variable_names": [
+        "subject"
+    ]
+}
