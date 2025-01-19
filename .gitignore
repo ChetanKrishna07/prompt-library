@@ -1,5 +1,5 @@
 .env
-run_guide.txt
-/__pycache__
 /pre_prompt
 .DS_Store
+
+/node_modules
